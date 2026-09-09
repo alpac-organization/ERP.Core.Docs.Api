@@ -1,6 +1,6 @@
 ---
-title: Flujo de actualización en CI/Release
-description: Cómo se regenera y despliega esta documentación automáticamente
+title: Flujo de despliegue automático
+description: Cómo el pipeline sincroniza el directorio Docs del backend y publica en GitHub Pages
 sidebar:
   order: 2
 module: Guías
@@ -9,90 +9,51 @@ module: Guías
 ## Partes involucradas
 
 ```
-ERP.Core.Manager.Api (backend)              erp-api-docs (este repo)
-┌─────────────────────────────┐             ┌──────────────────────────────┐
-│ 1. Controllers con /// XML  │             │ 1. Descarga el swagger.json   │
-│ 2. Swagger => swagger.json  │  release    │    (artifact / release)       │
-│ 3. Publica el artifact      ├───────────▶ │ 2. pnpm generate:docs         │
-└─────────────────────────────┘  repo_dispatch  3. pnpm build                │
-                                    │           4. Deploy GitHub Pages      │
-                                    └─────────▶ └──────────────────────────┘
+ERP.Core.Manager.Api (backend)                erp-api-docs (este repo)
+┌────────────────────────────────┐            ┌──────────────────────────────┐
+│ Docs/                          │            │ 1. Descarga Docs/**/*.md     │
+│   <Módulo>/<Endpoint>Docs.md   │  release   │ 2. Solo los .md existentes   │
+└────────────────────────────────┘  repo_    │ 3. Sync -> src/content/docs  │
+              ▲          dispatch ─────────▶ │ 4. Build (Astro Starlight)   │
+              │                   ─────────▶│ 5. Si no hay .md => aborta    │
+              │ (solo .md presentes)         │ 6. GitHub Pages               │
+              │                              └──────────────────────────────┘
 ```
 
-## 1. Backend: publicar el spec
+## 1. Backend: publicar la release
 
-En el CI del backend (`ci.yml`), en el job que levanta el contenedor, añade:
+Al publicar una release en `ERP.Core.Manager.Api`, se dispara este repo con un
+`repository_dispatch` (evento `api-released`). Es opcional: el sitio puede regenerarse
+con `workflow_dispatch` manual.
 
-```yaml
-- name: Export OpenAPI spec
-  run: |
-    # mientras el contenedor del smoke test está corriendo
-    curl -s http://localhost:8080/swagger/v1/swagger.json -o swagger.json
-    ls -la swagger.json
+## 2. Este repo: descargar `Docs` desde el backend
 
-- name: Publish spec as artifact
-  uses: actions/upload-artifact@v4
-  with:
-    name: swagger-spec
-    path: swagger.json
-```
+El workflow `.github/workflows/publish.yml`:
 
-## 2. Backend: disparar este repo al publicar release
+1. Descarga el directorio `Docs` del backend vía la **GitHub Contents API**
+   (`scripts/fetch-backend-docs.mjs`), copiando **solo los `.md`**.
+2. Si **no encuentra ningún `.md`**, termina con error y **no despliega nada**.
+3. `scripts/sync-docs.mjs` inyecta el `title`/`module` y copia los archivos a `src/content/docs/api/`.
+4. `astro build` genera el sitio.
+5. Se publica en **GitHub Pages** (`dist/`).
 
-```yaml
-on:
-  release:
-    types: [published]
-# ...
-jobs:
-  notify-docs:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.DOCS_REPO_TOKEN }}
-          script: |
-            await github.rest.repos.createDispatchEvent({
-              owner: 'alpac-organization',
-              repo: 'erp-api-docs',
-              event_type: 'api-released',
-              client_payload: { tag: context.ref }
-            });
-```
+## Configuración requerida (repo variables/secrets)
 
-## 3. Este repo: workflow `publish.yml`
+| Nombre | Tipo | Uso |
+|---|---|---|
+| `BACKEND_REPO` | Variable | Repo del backend, p. ej. `alpac-organization/ERP.Core.Manager.Api` |
+| `BACKEND_DOCS_PATH` | Variable | Ruta del directorio `Docs`, p. ej. `src/ERP.Core.Manager.Api/Docs` |
+| `BACKEND_REF` | Variable | Rama/tag a leer, p. ej. `develop` |
+| `BACKEND_READ_TOKEN` | Secret | Token con acceso de lectura al repo del backend (si es privado) |
 
-Se escucha el `repository_dispatch`, se descarga el spec, se regenera el Markdown y se
-despliega en **GitHub Pages**:
-
-```yaml
-on:
-  repository_dispatch:
-    types: [api-released]
-  workflow_dispatch:
-jobs:
-  publish:
-    runs-on: ubuntu-latest
-    permissions: { contents: write, pages: write, id-token: write }
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: 20, cache: npm }
-      - run: npm ci
-      - run: npm run generate:docs -- --spec-url https://api.example.com/swagger/v1/swagger.json
-      - run: npm run build
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
-        with: { path: dist }
-      - id: deploy
-        uses: actions/deploy-pages@v4
-```
-
-## Ejecutar localmente
+## Ejecutar en local
 
 ```bash
-# concretar un spec en local
-curl -s http://localhost:5038/swagger/v1/swagger.json -o swagger.local.json
-pnpm generate:docs -- --spec=./swagger.local.json
-pnpm dev
+# 1. Clonar/copiar el directorio Docs del backend local (o usar la ruta del repo)
+node scripts/sync-docs.mjs --source="..\Back-End\ERP.Core.Manager.Api\src\ERP.Core.Manager.Api\Docs"
+
+# 2. Levantar el sitio
+npm run dev
 ```
+
+Los archivos bajo `src/content/docs/api/**` son generados: se sobrescriben en cada sincronización.

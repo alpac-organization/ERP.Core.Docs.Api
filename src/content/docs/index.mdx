@@ -1,6 +1,6 @@
 ---
 title: Documentación de la API del ERP
-description: Documentación generada automáticamente desde el OpenAPI Spec del backend ERP.Core.Manager.Api
+description: Documentación de los endpoints del backend ERP.Core.Manager.Api, generada desde el directorio Docs
 sidebar:
   order: 0
 ---
@@ -8,20 +8,23 @@ sidebar:
 # 🧭 Documentación técnica del ERP
 
 Aquí encontrarás la **referencia de la API** del ERP Grupo Vassalli. La documentación se
-genera automáticamente desde el OpenAPI Spec del backend `ERP.Core.Manager.Api`.
+autoriza en el repositorio del backend `ERP.Core.Manager.Api`, dentro del directorio **`Docs`**,
+con un archivo Markdown por endpoint.
 
-## ¿Cómo se genera?
+## ¿Cómo se publica?
 
-La documentación **se crea una sola vez en el código** del backend (comentarios XML `///` sobre cada
-endpoint). Swashbuckle expone el [OpenAPI Spec](/api/overview/), un script lo convierte a Markdown,
-y Astro Starlight lo renderiza en este sitio. Al cambiar un endpoint, la documentación se actualiza
-automáticamente en cada release.
+Este sitio se actualiza **automáticamente** en cada release del backend:
+
+1. El pipeline descarga el directorio **`Docs`** del backend.
+2. Carga **solo** los Markdown que existen ahí (los endpoints sin `.md` no se publican).
+3. Si no hay ningún Markdown, **no se despliega nada**.
+4. Se compila con Astro Starlight y se publica en **GitHub Pages**.
 
 ## Contenido
 
 - [🔌 Vista general de la API](/api/overview/) — contrato, base URL, autenticación y convenciones.
-- [📘 Guías](/guides/add-documentation/) — cómo documentar endpoints y flujo de CI/Release.
-- **Endpoints por módulo** — en el menú lateral (`API`), generados a partir de cada tag del spec.
+- [📘 Guías](/guides/add-documentation/) — cómo documentar un endpoint en el directorio `Docs`.
+- **Endpoints por módulo** — en el menú lateral (`API`), generados a partir de los `.md` del directorio `Docs`.
 
 :::tip[Equipo de Frontend]
 Usa el menú **API** para consultar cada endpoint: parámetros, body, respuestas y códigos de error.

@@ -8,8 +8,9 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "generate:docs": "node scripts/generate-api-docs.mjs",
-    "generate:docs:check": "node scripts/generate-api-docs.mjs --check"
+    "docs:fetch": "node scripts/fetch-backend-docs.mjs",
+    "docs:sync": "node scripts/sync-docs.mjs",
+    "docs:sync:check": "node scripts/sync-docs.mjs --check"
   },
   "dependencies": {
     "@astrojs/starlight": "^0.34.0",

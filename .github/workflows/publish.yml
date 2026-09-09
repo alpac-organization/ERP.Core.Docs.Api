@@ -1,14 +1,17 @@
-name: Publicar documentación
+name: Documentación automática (GitHub Pages)
 
+# Se dispara desde el backend (release) vía repository_dispatch, o manualmente.
 on:
   repository_dispatch:
     types: [api-released]
   workflow_dispatch:
     inputs:
-      spec_url:
-        description: 'URL del OpenAPI Spec (opcional)'
+      backend_repo:
+        description: 'Repositorio del backend (owner/repo)'
         required: false
-        default: ''
+      backend_ref:
+        description: 'Rama/tag del backend a leer'
+        required: false
 
 permissions:
   contents: read
@@ -19,9 +22,15 @@ concurrency:
   group: pages
   cancel-in-progress: false
 
+env:
+  BACKEND_REPO: ${{ inputs.backend_repo || vars.BACKEND_REPO || 'alpac-organization/ERP.Core.Manager.Api' }}
+  BACKEND_DOCS_PATH: ${{ vars.BACKEND_DOCS_PATH || 'src/ERP.Core.Manager.Api/Docs' }}
+  BACKEND_REF: ${{ inputs.backend_ref || vars.BACKEND_REF || 'develop' }}
+
 jobs:
-  generate-and-publish:
+  publish:
     runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'repository_dispatch' }}
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -38,35 +47,37 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Download OpenAPI spec
-        id: download-spec
+      - name: Descargar Docs desde el backend (solo .md existentes)
+        id: fetch-docs
         run: |
-          # 1) Fuente preferida: input del workflow_dispatch.
-          URL="${{ inputs.spec_url }}"
-          # 2) Si no viene, usar la variable de entorno del repo.
-          if [ -z "$URL" ]; then URL="${OPENAPI_SPEC_URL:-}"; fi
-          if [ -z "$URL" ]; then
-            echo "::error::No se pudo obtener el spec. Define 'spec_url' (o OPENAPI_SPEC_URL en settings)."
-            exit 1
-          fi
-          echo "spec_url=$URL" >> "$GITHUB_OUTPUT"
-          curl -sS "$URL" -o swagger.local.json
-          ls -la swagger.local.json
+          TOKEN="${BACKEND_READ_TOKEN:-$GITHUB_TOKEN}"
+          node scripts/fetch-backend-docs.mjs \
+            --repo="$BACKEND_REPO" \
+            --path="$BACKEND_DOCS_PATH" \
+            --ref="$BACKEND_REF" \
+            --token="$TOKEN"
+        env:
+          BACKEND_READ_TOKEN: ${{ secrets.BACKEND_READ_TOKEN }}
 
-      - name: Generate markdown
-        run: npm run generate:docs -- --spec=./swagger.local.json
+      - name: Sincronizar documentos al sitio
+        if: success()
+        run: npm run docs:sync
 
-      - name: Build site
+      - name: Build del sitio
+        if: success()
         run: npm run build
 
-      - name: Configure GitHub Pages
+      - name: Configurar GitHub Pages
+        if: success()
         uses: actions/configure-pages@v5
 
-      - name: Upload pages artifact
+      - name: Subir artefacto de páginas
+        if: success()
         uses: actions/upload-pages-artifact@v3
         with:
           path: dist
 
-      - name: Deploy to GitHub Pages
+      - name: Desplegar a GitHub Pages
         id: deployment
+        if: success()
         uses: actions/deploy-pages@v4

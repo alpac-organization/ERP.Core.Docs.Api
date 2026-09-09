@@ -11,6 +11,9 @@ yarn.lock
 # runtime local spec (download de CI o local)
 swagger.local.json
 
+# carpeta de descarga del directorio Docs del backend
+backend-docs/
+
 # logs
 npm-debug.log*
 yarn-debug.log*

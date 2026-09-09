@@ -1,59 +1,68 @@
 ---
-title: Cómo agregar documentación a un endpoint
-description: Convección de comentarios XML para que tu endpoint aparezca en esta documentación
+title: Cómo documentar un endpoint
+description: Autoriza la documentación en el directorio Docs de ERP.Core.Manager.Api
 sidebar:
   order: 1
 ---
 
-La documentación se escribe **una sola vez**: en el código del backend, con comentarios XML
-sobre cada action de los controllers. Swagger los convierte en el OpenAPI Spec y este sitio
-refleja el resultado automáticamente.
+Para que un endpoint tenga documentación en este sitio, **se escribe un archivo Markdown en el
+directorio `Docs` del backend**. La estructura y el nombre del archivo definen dónde aparece.
 
-## 1. Habilita la generación del archivo XML
+## Ubicación
 
-En `ERP.Core.Manager.Api.csproj` (y opcionalmente en `Application.csproj`):
-
-```xml
-<PropertyGroup>
-  <GenerateDocumentationFile>true</GenerateDocumentationFile>
-  <NoWarn>$(NoWarn);CS1591</NoWarn>
-</PropertyGroup>
+```
+Back-End/ERP.Core.Manager.Api/src/ERP.Core.Manager.Api/Docs/
+└── <Módulo>/<Endpoint>Docs.md
 ```
 
-## 2. Enlaza los comentarios en Swagger
+`<Módulo>` es una carpeta (`Collaborators`, `Payroll`, `Catalog`, …) y `<Endpoint>` el nombre de la
+operación. Ejemplo real:
 
-En `Program.cs`, dentro de `AddSwaggerGen`:
-
-```csharp
-options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "ERP.Core.Manager.Api.xml"));
-options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "Application.xml"));
+```
+Docs/Collaborators/RegisterCollaboratorDocs.md
 ```
 
-## 3. Documenta cada endpoint con `///`
+Este archivo se publica como página bajo `/api/collaborators/register-collaborator/`.
 
-```csharp
-/// <summary>
-/// Registra una nueva deducción aplicada a un colaborador.
-/// </summary>
-/// <remarks>
-/// Valida el acceso del usuario al módulo y crea la deducción en el proceso de nómina activo.
-/// </remarks>
-/// <param name="companie_id">Identificador único de la compañía.</param>
-/// <param name="module_code">Código del módulo donde se registra la deducción.</param>
-/// <response code="201">Deducción creada correctamente.</response>
-/// <response code="400">Solicitud inválida.</response>
-[Tags("Deducciones")]
-[HttpPost("companies/{companie_id}/modules/{module_code}/deductions")]
-[ProducesResponseType(typeof(CreatedResult), StatusCodes.Status201Created)]
-[ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-public async Task<CreatedResult> RegisterDeductionAsync(...) { ... }
+## Formato del Markdown
+
+No **requiere** frontmatter: el título se toma de la primera cabecera. Un ejemplo mínimo:
+
+```md
+# Nómina - NMI-43GW
+
+## Registrar Colaboradores
+
+Endpoint para registrar colaborador dentro del módulo de nómina.
+
+## Información General
+
+| Campo | Valor |
+|-------|-------|
+| **Método**      | `POST` |
+| **Endpoint**    | `/api/v1/companies/{company_id}/modules/{module_code}/collaborators` |
+| **Descripción** | Registra un nuevo colaborador. |
 ```
 
-:::note
-Los comentarios con `//` no se reflejan en Swagger: deben ser `///` (comentarios XML).
+Puedes incluir secciones de **parámetros**, **headers**, **request body** (JSON) y **respuestas**,
+como en `RegisterCollaboratorDocs.md`. Se renderiza tal cual en el sitio.
+
+### Título (title)
+
+El `title` de la página se deduce en este orden:
+
+1. `title:` del frontmatter (si el archivo lo trae).
+2. Primera cabecera `## ` (nombre del endpoint).
+3. Primera cabecera `# `.
+4. Nombre del archivo.
+
+## Reglas del pipeline
+
+- **Solo se publican los Markdown que existen** en `Docs`. Un endpoint sin `.md` simplemente no aparece.
+- Si el directorio `Docs` no tiene ningún `.md`, el despliegue se **aborta** (no se sube nada).
+- Al hacer **release** del backend, el pipeline actualiza este sitio automáticamente.
+
+:::warning
+Los archivos Markdown viven en el repo del backend (`ERP.Core.Manager.Api`). No edites aquí los
+archivos bajo `src/content/docs/api/**` — se sobrescriben en cada sincronización.
 :::
-
-### Consecuencia
-
-Al hacer **release** del backend, el CI publica el `swagger.json`, el generador crea/actualiza
-el Markdown por módulo y el sitio se despliega. **Cero duplicación de documentación.**
