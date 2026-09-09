@@ -23,9 +23,9 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  BACKEND_REPO: ${{ inputs.backend_repo || vars.BACKEND_REPO || 'alpac-organization/ERP.Core.Manager.Api' }}
+  BACKEND_REPO: ${{ github.event.client_payload.repo || inputs.backend_repo || vars.BACKEND_REPO || 'alpac-organization/ERP.Core.Manager.Api' }}
   BACKEND_DOCS_PATH: ${{ vars.BACKEND_DOCS_PATH || 'src/ERP.Core.Manager.Api/Docs' }}
-  BACKEND_REF: ${{ inputs.backend_ref || vars.BACKEND_REF || 'develop' }}
+  BACKEND_REF: ${{ github.event.client_payload.ref || inputs.backend_ref || vars.BACKEND_REF || 'develop' }}
 
 jobs:
   publish:
