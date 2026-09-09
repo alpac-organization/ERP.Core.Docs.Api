@@ -1,0 +1,18 @@
+{
+  "apis": [
+    {
+      "slug": "administracion",
+      "label": "Administración",
+      "repo": "alpac-organization/ERP.Core.Manager.Api",
+      "docsPath": "src/ERP.Core.Manager.Api/Docs",
+      "ref": "develop"
+    },
+    {
+      "slug": "almacen",
+      "label": "Almacén",
+      "repo": "alpac-organization/ERP.Core.Warehouse.Api",
+      "docsPath": "Docs",
+      "ref": "configuracion-documentacion"
+    }
+  ]
+}

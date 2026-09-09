@@ -26,7 +26,26 @@ export default defineConfig({
         },
         {
           label: '🔌 API',
-          autogenerate: { directory: 'api', collapsed: false },
+          collapsed: false,
+          items: [
+            {
+              label: 'Vista general',
+              items: [
+                {
+                  label: 'Contrato y convenciones',
+                  slug: 'api/overview',
+                },
+              ],
+            },
+            {
+              label: 'Administración',
+              autogenerate: { directory: 'api/administracion', collapsed: false },
+            },
+            {
+              label: 'Almacén',
+              autogenerate: { directory: 'api/almacen', collapsed: false },
+            },
+          ],
         },
       ],
       customCss: ['./src/styles/theme.css'],

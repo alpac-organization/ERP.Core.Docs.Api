@@ -10,19 +10,27 @@ directorio `Docs` del backend**. La estructura y el nombre del archivo definen d
 
 ## Ubicación
 
+Cada backend guarda su documentación en su directorio **`Docs`**:
+
+| API | Repositorio | Directorio `Docs` |
+| --- | --- | --- |
+| Administración | `ERP.Core.Manager.Api` | `src/ERP.Core.Manager.Api/Docs/` |
+| Almacén | `ERP.Core.Warehouse.Api` | `Docs/` (raíz del repo) |
+
 ```
-Back-End/ERP.Core.Manager.Api/src/ERP.Core.Manager.Api/Docs/
+Docs/
 └── <Módulo>/<Endpoint>Docs.md
 ```
 
-`<Módulo>` es una carpeta (`Collaborators`, `Payroll`, `Catalog`, …) y `<Endpoint>` el nombre de la
-operación. Ejemplo real:
+`<Módulo>` es una carpeta (`Collaborators`, `Payroll`, `Products`, `Movements`, …) y `<Endpoint>`
+el nombre de la operación. Ejemplo real (Administración):
 
 ```
 Docs/Collaborators/RegisterCollaboratorDocs.md
 ```
 
-Este archivo se publica como página bajo `/api/collaborators/register-collaborator/`.
+Se publica como página bajo `/api/administracion/collaborators/register-collaborator/` (para Almacén:
+`/api/almacen/...`). La lista de APIs se define en **`docs.config.json`**.
 
 ## Formato del Markdown
 

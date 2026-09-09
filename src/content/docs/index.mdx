@@ -1,6 +1,6 @@
 ---
 title: Documentación de la API del ERP
-description: Documentación de los endpoints del backend ERP.Core.Manager.Api, generada desde el directorio Docs
+description: Documentación de los endpoints de los backends del ERP Grupo Vassalli, generada desde el directorio Docs de cada repositorio
 sidebar:
   order: 0
 ---
@@ -8,23 +8,32 @@ sidebar:
 # 🧭 Documentación técnica del ERP
 
 Aquí encontrarás la **referencia de la API** del ERP Grupo Vassalli. La documentación se
-autoriza en el repositorio del backend `ERP.Core.Manager.Api`, dentro del directorio **`Docs`**,
-con un archivo Markdown por endpoint.
+autoriza en cada repositorio del backend, dentro del directorio **`Docs`**, con un archivo
+Markdown por endpoint.
+
+## APIs documentadas
+
+Esta documentación sincroniza los endpoints de varios backends:
+
+| API | Repositorio | Descripción |
+| --- | --- | --- |
+| **Administración** | `ERP.Core.Manager.Api` | Autenticación, catálogos, nómina, reportes, notificaciones. |
+| **Almacén** | `ERP.Core.Warehouse.Api` | Módulo de almacén/warehouse. |
 
 ## ¿Cómo se publica?
 
-Este sitio se actualiza **automáticamente** en cada release del backend:
+Este sitio se actualiza **automáticamente** en cada release de los backends:
 
-1. El pipeline descarga el directorio **`Docs`** del backend.
-2. Carga **solo** los Markdown que existen ahí (los endpoints sin `.md` no se publican).
-3. Si no hay ningún Markdown, **no se despliega nada**.
+1. El pipeline descarga el directorio **`Docs`** de cada repositorio.
+2. Carga **solo** los Markdown que existen (los endpoints sin `.md` no se publican).
+3. Si no hay ningún Markdown en total, **no se despliega nada**.
 4. Se compila con Astro Starlight y se publica en **GitHub Pages**.
 
 ## Contenido
 
 - [🔌 Vista general de la API](/api/overview/) — contrato, base URL, autenticación y convenciones.
 - [📘 Guías](/guides/add-documentation/) — cómo documentar un endpoint en el directorio `Docs`.
-- **Endpoints por módulo** — en el menú lateral (`API`), generados a partir de los `.md` del directorio `Docs`.
+- **Endpoints por módulo** — en el menú lateral (`API`), agrupados por `Administración` y `Almacén`.
 
 :::tip[Equipo de Frontend]
 Usa el menú **API** para consultar cada endpoint: parámetros, body, respuestas y códigos de error.

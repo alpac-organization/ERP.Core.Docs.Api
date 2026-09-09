@@ -1,17 +1,10 @@
 name: Documentación automática (GitHub Pages)
 
-# Se dispara desde el backend (release) vía repository_dispatch, o manualmente.
+# Se dispara desde los backends (release) vía repository_dispatch, o manualmente.
 on:
   repository_dispatch:
     types: [api-released]
   workflow_dispatch:
-    inputs:
-      backend_repo:
-        description: 'Repositorio del backend (owner/repo)'
-        required: false
-      backend_ref:
-        description: 'Rama/tag del backend a leer'
-        required: false
 
 permissions:
   contents: read
@@ -22,15 +15,9 @@ concurrency:
   group: pages
   cancel-in-progress: false
 
-env:
-  BACKEND_REPO: ${{ github.event.client_payload.repo || inputs.backend_repo || vars.BACKEND_REPO || 'alpac-organization/ERP.Core.Manager.Api' }}
-  BACKEND_DOCS_PATH: ${{ vars.BACKEND_DOCS_PATH || 'src/ERP.Core.Manager.Api/Docs' }}
-  BACKEND_REF: ${{ github.event.client_payload.ref || inputs.backend_ref || vars.BACKEND_REF || 'develop' }}
-
 jobs:
   publish:
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'repository_dispatch' }}
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -47,17 +34,22 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Descargar Docs desde el backend (solo .md existentes)
-        id: fetch-docs
+      - name: Descargar Docs desde los backends (solo .md existentes)
         run: |
-          TOKEN="${BACKEND_READ_TOKEN:-$GITHUB_TOKEN}"
+          # Si la release llega con ref/repo, se usa para la fuente que coincida.
+          if [ -n "$REF_PAYLOAD" ] && [ -n "$REPO_PAYLOAD" ]; then
+            OVERRIDES=$(node -e "console.log(JSON.stringify({['$REPO_PAYLOAD']:'$REF_PAYLOAD'}))")
+          else
+            OVERRIDES='{}'
+          fi
           node scripts/fetch-backend-docs.mjs \
-            --repo="$BACKEND_REPO" \
-            --path="$BACKEND_DOCS_PATH" \
-            --ref="$BACKEND_REF" \
-            --token="$TOKEN"
+            --config=./docs.config.json \
+            --token="$BACKEND_READ_TOKEN" \
+            --repo-ref-overrides="$OVERRIDES"
         env:
           BACKEND_READ_TOKEN: ${{ secrets.BACKEND_READ_TOKEN }}
+          REPO_PAYLOAD: ${{ github.event.client_payload.repo }}
+          REF_PAYLOAD: ${{ github.event.client_payload.ref }}
 
       - name: Sincronizar documentos al sitio
         if: success()

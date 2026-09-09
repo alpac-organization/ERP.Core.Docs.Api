@@ -49,11 +49,15 @@ El workflow `.github/workflows/publish.yml`:
 ## Ejecutar en local
 
 ```bash
-# 1. Clonar/copiar el directorio Docs del backend local (o usar la ruta del repo)
-node scripts/sync-docs.mjs --source="..\Back-End\ERP.Core.Manager.Api\src\ERP.Core.Manager.Api\Docs"
+# 1. Descargar los Docs de los backends (solo .md existentes)
+node scripts/fetch-backend-docs.mjs --config=./docs.config.json --token="$GITHUB_TOKEN"
 
-# 2. Levantar el sitio
+# 2. Sincronizar al sitio
+node scripts/sync-docs.mjs --config=./docs.config.json
+
+# 3. Levantar el sitio
 npm run dev
 ```
 
 Los archivos bajo `src/content/docs/api/**` son generados: se sobrescriben en cada sincronización.
+Las fuentes (repos, rutas, ramas) se definen en **`docs.config.json`**.
