@@ -1,0 +1,53 @@
+---
+title: Vista general de la API
+description: Contrato OpenAPI, base URL, autenticación y convenciones
+module: API
+---
+
+## Contrato OpenAPI
+
+El contrato de esta documentación es el **OpenAPI Spec** servido por el backend en:
+
+```
+GET /swagger/v1/swagger.json
+```
+
+Este JSON es la **fuente de verdad**: a partir de él se generan los Markdown que ves en este sitio.
+
+## Base URL
+
+Depende del ambiente:
+
+| Ambiente | URL |
+|---|---|
+| Local | `http://localhost:5038` |
+| CI / pre-prod | según `.env` del backend |
+
+Los endpoints usan el prefijo **`api/v1`** y el nombre de la compañía como fragmento:
+
+```
+POST {base}/api/v1/companies/{companie_id}/modules/{module_code}/...
+```
+
+## Autenticación
+
+- Cabecera **`x-api-key`** (API Key) para acceder a la API.
+- Cabecera **`Authorization: Bearer <token>`** (JWT) en endpoints protegidos con `[HasToken]`.
+
+## Convenciones de rutas
+
+- **Verbos REST** (`GET`, `POST`, `PATCH`, `DELETE`).
+- Parámetros de ruta en `snake_case` (p. ej. `companie_id`, `module_code`).
+- Cuerpo y respuestas en JSON con **`snake_case`** (`PropertyNamingPolicy`).
+- Paginación mediante `page_number` / `page_size` y respuestas `PagedResponse`.
+- Errores con el formato `ErrorResponse` (`TypeError` + `Description`).
+
+## Módulos
+
+Cada endpoint pertenece a un `Tag` que agrupa la documentación por módulo de negocio:
+
+- **Autenticación**
+- **Catálogos** (productos, proveedores, clientes, áreas…)
+- **Nómina** (deducciones, ingresos, subsidios, vacaciones, permisos…)
+- **Reportes**
+- **Notificaciones**

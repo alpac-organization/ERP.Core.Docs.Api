@@ -1,0 +1,27 @@
+:root {
+  --brand-primary: #0f766e;
+  --brand-primary-dark: #115e59;
+  --brand-accent: #0d9488;
+}
+
+/* Ajuste de la marca sobre el tema de Starlight */
+:root {
+  --sl-color-accent-low: #ccfbf1;
+  --sl-color-accent: #0d9488;
+  --sl-color-accent-high: #0f766e;
+  --sl-color-accent-low: oklch(0.88 0.07 180);
+  --sl-color-accent-high: oklch(0.4 0.11 180);
+  --sl-color-text-accent: var(--brand-accent);
+}
+
+.site-title {
+  font-weight: 700;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-theme='dark'] {
+    --sl-color-accent-low: oklch(0.35 0.1 180);
+    --sl-color-accent: #2dd4bf;
+    --sl-color-accent-high: #5eead4;
+  }
+}

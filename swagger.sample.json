@@ -1,0 +1,227 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "ERP.Core.Manager.Api",
+    "version": "v1",
+    "description": "Dominio para administración"
+  },
+  "paths": {
+    "/api/v1/companies/{companie_id}/auth/login": {
+      "post": {
+        "tags": ["Autenticación"],
+        "summary": "Inicia sesión con usuario o correo y contraseña.",
+        "description": "Valida las credenciales, verifica el perfil del usuario en la compañía y devuelve los tokens de acceso y refresco junto con la información de la compañía.",
+        "operationId": "LoginWithUsernameOrEmailWithPasswordAsync",
+        "parameters": [
+          {
+            "name": "companie_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" },
+            "description": "Identificador único de la compañía (GUID)."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/LoginWithUsernameAndPasswordCommand" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Autenticación exitosa.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/LoginDto" }
+              }
+            }
+          },
+          "400": {
+            "description": "Credenciales inválidas o usuario sin perfil.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          },
+          "404": {
+            "description": "Usuario no encontrado.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/companies/{companie_id}/modules/{module_code}/deductions": {
+      "post": {
+        "tags": ["Deducciones"],
+        "summary": "Registra una nueva deducción aplicada a un colaborador.",
+        "description": "Valida el acceso del usuario al módulo y crea la deducción en el proceso de nómina activo.",
+        "operationId": "RegisterDeductionAsync",
+        "parameters": [
+          {
+            "name": "companie_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" },
+            "description": "Identificador único de la compañía."
+          },
+          {
+            "name": "module_code",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Código del módulo donde se registra la deducción."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/RegisterDeductionCommand" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Deducción creada correctamente." },
+          "400": {
+            "description": "Solicitud inválida o deducción no permitida.",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          },
+          "500": {
+            "description": "Error interno del servidor.",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          }
+        }
+      },
+      "get": {
+        "tags": ["Deducciones"],
+        "summary": "Obtiene las deducciones registradas.",
+        "operationId": "GetDeductionsActiveAsync",
+        "parameters": [
+          {
+            "name": "companie_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" },
+            "description": "Identificador único de la compañía."
+          },
+          {
+            "name": "module_code",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Código del módulo."
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "Tipo de deducción (e.g. DeductionType)."
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "Estado de la deducción (DeductionStatus)."
+          },
+          {
+            "name": "page_number",
+            "in": "query",
+            "schema": { "type": "integer", "default": 1 },
+            "description": "Número de página."
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "schema": { "type": "integer", "default": 10 },
+            "description": "Tamaño de página."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista paginada de deducciones.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PagedResponseDeduction" }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida.",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "LoginWithUsernameAndPasswordCommand": {
+        "type": "object",
+        "properties": {
+          "username": { "type": "string" },
+          "email": { "type": "string" },
+          "password": { "type": "string" }
+        }
+      },
+      "LoginDto": {
+        "type": "object",
+        "properties": {
+          "access_token": { "type": "string" },
+          "refresh_token": { "type": "string" },
+          "branch_id": { "type": "string", "format": "uuid" }
+        }
+      },
+      "RegisterDeductionCommand": {
+        "type": "object",
+        "properties": {
+          "type": { "type": "string" },
+          "amount": { "type": "number" },
+          "frequency": { "type": "string" }
+        }
+      },
+      "DeductionDto": {
+        "type": "object",
+        "properties": {
+          "deduction_id": { "type": "string", "format": "uuid" },
+          "amount": { "type": "number" }
+        }
+      },
+      "PagedResponseDeduction": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/DeductionDto" }
+          },
+          "page_number": { "type": "integer" },
+          "page_size": { "type": "integer" },
+          "total_count": { "type": "integer" }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "integer" },
+          "error": {
+            "type": "object",
+            "properties": {
+              "typeError": { "type": "string" },
+              "description": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "tags": [
+      { "name": "Autenticación", "description": "Inicio de sesión, refresco y cierre de sesión." },
+      { "name": "Deducciones", "description": "Gestión de deducciones del colaborador en nómina." }
+    ]
+  }
+}

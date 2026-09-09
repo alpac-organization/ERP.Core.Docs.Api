@@ -1,0 +1,98 @@
+---
+title: Flujo de actualización en CI/Release
+description: Cómo se regenera y despliega esta documentación automáticamente
+sidebar:
+  order: 2
+module: Guías
+---
+
+## Partes involucradas
+
+```
+ERP.Core.Manager.Api (backend)              erp-api-docs (este repo)
+┌─────────────────────────────┐             ┌──────────────────────────────┐
+│ 1. Controllers con /// XML  │             │ 1. Descarga el swagger.json   │
+│ 2. Swagger => swagger.json  │  release    │    (artifact / release)       │
+│ 3. Publica el artifact      ├───────────▶ │ 2. pnpm generate:docs         │
+└─────────────────────────────┘  repo_dispatch  3. pnpm build                │
+                                    │           4. Deploy GitHub Pages      │
+                                    └─────────▶ └──────────────────────────┘
+```
+
+## 1. Backend: publicar el spec
+
+En el CI del backend (`ci.yml`), en el job que levanta el contenedor, añade:
+
+```yaml
+- name: Export OpenAPI spec
+  run: |
+    # mientras el contenedor del smoke test está corriendo
+    curl -s http://localhost:8080/swagger/v1/swagger.json -o swagger.json
+    ls -la swagger.json
+
+- name: Publish spec as artifact
+  uses: actions/upload-artifact@v4
+  with:
+    name: swagger-spec
+    path: swagger.json
+```
+
+## 2. Backend: disparar este repo al publicar release
+
+```yaml
+on:
+  release:
+    types: [published]
+# ...
+jobs:
+  notify-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.DOCS_REPO_TOKEN }}
+          script: |
+            await github.rest.repos.createDispatchEvent({
+              owner: 'alpac-organization',
+              repo: 'erp-api-docs',
+              event_type: 'api-released',
+              client_payload: { tag: context.ref }
+            });
+```
+
+## 3. Este repo: workflow `publish.yml`
+
+Se escucha el `repository_dispatch`, se descarga el spec, se regenera el Markdown y se
+despliega en **GitHub Pages**:
+
+```yaml
+on:
+  repository_dispatch:
+    types: [api-released]
+  workflow_dispatch:
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions: { contents: write, pages: write, id-token: write }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: npm }
+      - run: npm ci
+      - run: npm run generate:docs -- --spec-url https://api.example.com/swagger/v1/swagger.json
+      - run: npm run build
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: dist }
+      - id: deploy
+        uses: actions/deploy-pages@v4
+```
+
+## Ejecutar localmente
+
+```bash
+# concretar un spec en local
+curl -s http://localhost:5038/swagger/v1/swagger.json -o swagger.local.json
+pnpm generate:docs -- --spec=./swagger.local.json
+pnpm dev
+```

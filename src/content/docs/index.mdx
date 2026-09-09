@@ -1,0 +1,28 @@
+---
+title: Documentación de la API del ERP
+description: Documentación generada automáticamente desde el OpenAPI Spec del backend ERP.Core.Manager.Api
+sidebar:
+  order: 0
+---
+
+# 🧭 Documentación técnica del ERP
+
+Aquí encontrarás la **referencia de la API** del ERP Grupo Vassalli. La documentación se
+genera automáticamente desde el OpenAPI Spec del backend `ERP.Core.Manager.Api`.
+
+## ¿Cómo se genera?
+
+La documentación **se crea una sola vez en el código** del backend (comentarios XML `///` sobre cada
+endpoint). Swashbuckle expone el [OpenAPI Spec](/api/overview/), un script lo convierte a Markdown,
+y Astro Starlight lo renderiza en este sitio. Al cambiar un endpoint, la documentación se actualiza
+automáticamente en cada release.
+
+## Contenido
+
+- [🔌 Vista general de la API](/api/overview/) — contrato, base URL, autenticación y convenciones.
+- [📘 Guías](/guides/add-documentation/) — cómo documentar endpoints y flujo de CI/Release.
+- **Endpoints por módulo** — en el menú lateral (`API`), generados a partir de cada tag del spec.
+
+:::tip[Equipo de Frontend]
+Usa el menú **API** para consultar cada endpoint: parámetros, body, respuestas y códigos de error.
+:::

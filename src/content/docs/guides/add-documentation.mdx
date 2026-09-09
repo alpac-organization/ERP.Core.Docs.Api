@@ -1,0 +1,59 @@
+---
+title: Cómo agregar documentación a un endpoint
+description: Convección de comentarios XML para que tu endpoint aparezca en esta documentación
+sidebar:
+  order: 1
+---
+
+La documentación se escribe **una sola vez**: en el código del backend, con comentarios XML
+sobre cada action de los controllers. Swagger los convierte en el OpenAPI Spec y este sitio
+refleja el resultado automáticamente.
+
+## 1. Habilita la generación del archivo XML
+
+En `ERP.Core.Manager.Api.csproj` (y opcionalmente en `Application.csproj`):
+
+```xml
+<PropertyGroup>
+  <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  <NoWarn>$(NoWarn);CS1591</NoWarn>
+</PropertyGroup>
+```
+
+## 2. Enlaza los comentarios en Swagger
+
+En `Program.cs`, dentro de `AddSwaggerGen`:
+
+```csharp
+options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "ERP.Core.Manager.Api.xml"));
+options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "Application.xml"));
+```
+
+## 3. Documenta cada endpoint con `///`
+
+```csharp
+/// <summary>
+/// Registra una nueva deducción aplicada a un colaborador.
+/// </summary>
+/// <remarks>
+/// Valida el acceso del usuario al módulo y crea la deducción en el proceso de nómina activo.
+/// </remarks>
+/// <param name="companie_id">Identificador único de la compañía.</param>
+/// <param name="module_code">Código del módulo donde se registra la deducción.</param>
+/// <response code="201">Deducción creada correctamente.</response>
+/// <response code="400">Solicitud inválida.</response>
+[Tags("Deducciones")]
+[HttpPost("companies/{companie_id}/modules/{module_code}/deductions")]
+[ProducesResponseType(typeof(CreatedResult), StatusCodes.Status201Created)]
+[ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+public async Task<CreatedResult> RegisterDeductionAsync(...) { ... }
+```
+
+:::note
+Los comentarios con `//` no se reflejan en Swagger: deben ser `///` (comentarios XML).
+:::
+
+### Consecuencia
+
+Al hacer **release** del backend, el CI publica el `swagger.json`, el generador crea/actualiza
+el Markdown por módulo y el sitio se despliega. **Cero duplicación de documentación.**
