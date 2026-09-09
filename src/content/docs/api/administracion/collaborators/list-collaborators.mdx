@@ -1,0 +1,93 @@
+---
+title: "Listar Colaboradores"
+module: "Collaborators"
+---
+
+EndPoint para listar los colaboradores asociados a un módulo de nómina.
+
+## Información General
+
+| Campo | Valor |
+|-------|-------|
+| **Método** | <span className="http-method get">GET</span> |
+| **Endpoint** | `/api/v1/companies/{company_id}/modules/{module_code}/collaborators` |
+| **Descripción** | Lista los colaboradores de una compañía y módulo, con paginación. |
+
+---
+
+## Parámetros de Ruta (Path Params)
+
+| Parámetro | Tipo | Requerido | Descripción |
+|:---------:|:----:|:---------:|-------------|
+| `company_id` | `string` | <span className="pill required">Sí</span> | Identificador único de la compañía. |
+| `module_code` | `string` | <span className="pill required">Sí</span> | Código del módulo dentro de la compañía (ej. `NMI-43GW`). |
+
+---
+
+## Parámetros de Consulta (Query Params)
+
+| Parámetro | Tipo | Requerido | Descripción |
+|:---------:|:----:|:---------:|-------------|
+| `page_number` | `integer` | <span className="pill optional">No</span> | Número de página. Default: `1`. |
+| `page_size` | `integer` | <span className="pill optional">No</span> | Tamaño de página. Default: `10`. |
+| `search` | `string` | <span className="pill optional">No</span> | Búsqueda por nombre o identificación. |
+
+---
+
+## Headers
+
+| Header | Valor | Requerido |
+|--------|-------|:---------:|
+| `Authorization` | `Bearer {token}` | <span className="pill required">Sí</span> |
+| `Content-Type` | `application/json` | <span className="pill optional">No</span> |
+
+---
+
+## Respuestas
+
+### ✅ 200 OK
+
+```json
+{
+  "items": [
+    {
+      "id": "5f8d0d55-6c8a-4a2b-9d3f-000000000001",
+      "first_name": "Juan",
+      "first_lastname": "Pérez",
+      "identification_number": "001-090926-0001A",
+      "status": "Active",
+      "work_email": "juan.perez@empresa.com"
+    }
+  ],
+  "page_number": 1,
+  "page_size": 10,
+  "total_items": 34,
+  "total_pages": 4
+}
+```
+
+### ❌ 400 Bad Request
+
+```json
+{
+  "status": 400,
+  "error": {
+    "type_error": "ValidationError",
+    "description": "El módulo no existe."
+  },
+  "created_at": "2026-09-09 10:00:00"
+}
+```
+
+### ❌ 401 Unauthorized
+
+```json
+{
+  "status": 401,
+  "error": {
+    "type_error": "Unauthorized",
+    "description": "Token de autenticación inválido o expirado"
+  },
+  "created_at": "2026-09-09 10:00:00"
+}
+```

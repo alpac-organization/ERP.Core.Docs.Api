@@ -3,10 +3,6 @@ title: "Registrar Colaboradores"
 module: "Collaborators"
 ---
 
-# Nómina - NMI-43GW
-
-## Registrar Colaboradores
-
 Endpoint para registrar colaborador dentro del modulo de nomina.
 
 ## Información General
