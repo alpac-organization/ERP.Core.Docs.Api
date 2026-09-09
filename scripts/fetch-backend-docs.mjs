@@ -1,20 +1,3 @@
-#!/usr/bin/env node
-/**
- * fetch-backend-docs.mjs
- * Descarga los directorios `Docs/` de uno o varios repositorios del backend desde GitHub,
- * copiando SOLO los archivos `.md` que existen. Se omiten los archivos `README*`.
- *
- * - Modo multi-fuente (recomendado): --config=docs.config.json  (json con "apis": [...])
- * - Modo simple (compatibilidad):    --repo=/ --path=/ --ref=/ --slug=/ --out=/
- *
- * Regla importante: si NO se descarga ningún `.md` en total, el proceso sale con código
- * distinto de 0 para que el CI no despliegue nada.
- *
- * Uso:
- *   node scripts/fetch-backend-docs.mjs --config=./docs.config.json \
- *     --token=$GITHUB_TOKEN --out=./backend-docs \
- *     --repo-ref-overrides='{"owner/repo":"v1.2.0"}'
- */
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
