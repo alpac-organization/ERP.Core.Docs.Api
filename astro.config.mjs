@@ -38,11 +38,11 @@ export default defineConfig({
               ],
             },
             {
-              label: 'Administración',
+              label: 'ERP.Core.Manager.Api',
               autogenerate: { directory: 'api/administracion', collapsed: false },
             },
             {
-              label: 'Almacén',
+              label: 'ERP.Core.Warehouse.Api',
               autogenerate: { directory: 'api/almacen', collapsed: false },
             },
           ],

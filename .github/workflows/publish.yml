@@ -1,9 +1,9 @@
 name: Documentación automática (GitHub Pages)
 
-# Se dispara desde los backends (release) vía repository_dispatch, o manualmente.
+# Se dispara desde los backends (push a develop) vía repository_dispatch, o manualmente.
 on:
   repository_dispatch:
-    types: [api-released]
+    types: [api-updated]
   workflow_dispatch:
 
 permissions:
