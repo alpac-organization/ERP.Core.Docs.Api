@@ -697,8 +697,129 @@ starlight-theme-select label:hover {
   }
 }
 
+/* --- Evitar desbordes horizontales generales --- */
+.sl-markdown-content {
+  overflow-wrap: break-word;
+}
+
+.sl-markdown-content img,
+.sl-markdown-content video,
+.sl-markdown-content iframe,
+.sl-markdown-content svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Inline code largo no debe empujar el layout */
+:not(pre) > code {
+  overflow-wrap: anywhere;
+}
+
+/* Bloques de código: scroll horizontal propio, nunca desbordan la página */
+.sl-markdown-content pre,
+.expressive-code pre,
+pre.astro-code {
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* --- Tablet: reducir columnas laterales para dar aire al contenido --- */
+@media (max-width: 72em) {
+  :root {
+    --sl-sidebar-width: 18rem;
+  }
+
+  .right-sidebar-container {
+    width: 12rem !important;
+    flex-basis: 12rem;
+  }
+}
+
+/* --- Móvil / pantallas estrechas --- */
 @media (max-width: 50em) {
   :root {
     --sl-content-width: 100%;
+    --sl-content-pad-x: 1rem;
+    --sl-sidebar-width: 100%;
+  }
+
+  .main-frame {
+    padding-inline: 1rem;
+  }
+
+  /* Tablas: scroll horizontal en lugar de romper la página */
+  .sl-markdown-content table {
+    display: block;
+    width: max-content;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: var(--radius-md);
+  }
+
+  .sl-markdown-content th {
+    white-space: nowrap;
+    padding: 0.55rem 0.75rem;
+  }
+
+  .sl-markdown-content td {
+    padding: 0.55rem 0.75rem;
+  }
+
+  /* Títulos algo más compactos */
+  main h1 {
+    font-size: clamp(1.75rem, 7vw, 2.25rem);
+  }
+
+  main h2 {
+    font-size: 1.45rem;
+    margin-top: 2rem;
+  }
+
+  main h3 {
+    font-size: 1.18rem;
+  }
+
+  .sl-markdown-content {
+    font-size: 0.97rem;
+    line-height: 1.72;
+  }
+
+  .starlight-aside {
+    padding: 0.85rem 1rem;
+  }
+}
+
+/* --- Pantallas muy pequeñas --- */
+@media (max-width: 30em) {
+  body {
+    font-size: 15px;
+  }
+
+  .main-frame {
+    padding-inline: 0.85rem;
+  }
+
+  main h1 {
+    font-size: 1.65rem;
+  }
+
+  main h2 {
+    font-size: 1.3rem;
+  }
+
+  main h3 {
+    font-size: 1.1rem;
+  }
+
+  .sl-markdown-content th,
+  .sl-markdown-content td {
+    padding: 0.5rem 0.6rem;
+    font-size: 0.88rem;
+  }
+
+  .sl-markdown-content pre {
+    font-size: 0.82rem;
   }
 }
