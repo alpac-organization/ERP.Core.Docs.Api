@@ -11,7 +11,7 @@
       "slug": "almacen",
       "label": "ERP.Core.Warehouse.Api",
       "repo": "alpac-organization/ERP.Core.Warehouse.Api",
-      "docsPath": "Docs",
+      "docsPath": "src/ERP.Core.Warehouse.Api/Docs",
       "ref": "develop"
     }
   ]
