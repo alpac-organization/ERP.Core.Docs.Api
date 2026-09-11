@@ -1,4 +1,4 @@
----
+﻿---
 title: "Modificar Cuenta Bancaria de Proveedor"
 module: "BankAccount"
 ---
@@ -6,8 +6,6 @@ module: "BankAccount"
 ## Modificar Cuenta Bancaria de Proveedor
 
 Endpoint para actualizar parcialmente los datos de una cuenta bancaria o cambiar el estado de cuenta principal.
-
-## Información General
 
 | Campo | Valor |
 |---|---|

@@ -1,4 +1,4 @@
----
+﻿---
 title: "Agregar Cuenta Bancaria a Proveedor"
 module: "BankAccount"
 ---
@@ -6,8 +6,6 @@ module: "BankAccount"
 ## Agregar Cuenta Bancaria a Proveedor
 
 Endpoint para registrar una nueva cuenta bancaria a un proveedor existente.
-
-## Información General
 
 | Campo | Valor |
 |---|---|

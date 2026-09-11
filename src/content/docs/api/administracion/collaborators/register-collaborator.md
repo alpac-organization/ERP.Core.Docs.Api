@@ -1,4 +1,4 @@
----
+﻿---
 title: "Registrar Colaboradores"
 module: "Collaborators"
 ---
@@ -6,8 +6,6 @@ module: "Collaborators"
 ## Registrar Colaboradores
 
 Endpoint para registrar colaborador dentro del modulo de nomina.
-
-## Información General
 
 | Campo | Valor     |
 |-------|-----------|

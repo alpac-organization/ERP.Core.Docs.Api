@@ -1,4 +1,4 @@
----
+﻿---
 title: "Actualizar Información de Proveedor"
 module: "Suppliers"
 ---
@@ -6,8 +6,6 @@ module: "Suppliers"
 ## Actualizar Información de Proveedor
 
 Endpoint para actualizar de manera parcial los datos generales y detalles de crédito o fiscales de un proveedor existente.
-
-## Información General
 
 | Campo | Valor |
 |---|---|

@@ -1,4 +1,4 @@
----
+﻿---
 title: "Listar Proveedores"
 module: "Suppliers"
 ---
@@ -6,8 +6,6 @@ module: "Suppliers"
 ## Listar Proveedores
 
 Endpoint para listar con paginación y filtros los proveedores registrados dentro de una compañía y módulo.
-
-## Información General
 
 | Campo | Valor |
 |---|---|

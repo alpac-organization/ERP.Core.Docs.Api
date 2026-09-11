@@ -1,4 +1,4 @@
----
+﻿---
 title: "Eliminar Cuenta Bancaria de Proveedor"
 module: "BankAccount"
 ---
@@ -6,8 +6,6 @@ module: "BankAccount"
 ## Eliminar Cuenta Bancaria de Proveedor
 
 Endpoint para eliminación lógica (`soft delete`) de una cuenta bancaria asignada a un proveedor.
-
-## Información General
 
 | Campo | Valor |
 |---|---|
