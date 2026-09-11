@@ -1,13 +1,9 @@
----
+﻿---
 title: "Obtener Detalles de Proveedor"
 module: "Suppliers"
 ---
 
-## Obtener Detalles de Proveedor
-
 Endpoint para consultar la ficha completa de un proveedor, incluyendo sus datos comerciales, detalles de crédito, información del usuario registrador y lista de cuentas bancarias activas.
-
-## Información General
 
 | Campo | Valor |
 |---|---|

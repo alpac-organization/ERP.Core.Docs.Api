@@ -1,15 +1,11 @@
----
+﻿---
 title: "Registrar Sección"
 module: "WarehouseSections"
 ---
 
 # Almacén
 
-## Registrar Sección
-
 Endpoint para registrar una sección dentro de un almacén de una compañía/módulo.
-
-## Información General
 
 | Campo | Valor |
 |-------|-------|
