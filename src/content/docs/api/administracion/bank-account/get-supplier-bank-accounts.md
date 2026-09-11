@@ -1,13 +1,9 @@
----
+﻿---
 title: "Listar Cuentas Bancarias del Proveedor"
 module: "BankAccount"
 ---
 
-## Listar Cuentas Bancarias del Proveedor
-
 Endpoint para consultar todas las cuentas bancarias activas pertenecientes a un proveedor específico.
-
-## Información General
 
 | Campo | Valor |
 |---|---|

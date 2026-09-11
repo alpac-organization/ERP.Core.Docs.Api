@@ -74,6 +74,15 @@ function existingTitle(md) {
   return t ? t[1].trim().replace(/^['"]|['"]$/g, '') : undefined;
 }
 
+function rewriteRelativeLinks(content) {
+  return content.replace(/(\.\.\/[^\s)]+\.md)/g, (match) => {
+    const path = match.replace(/\.md$/, '');
+    const parts = path.split('/');
+    const rewritten = parts.map((p) => (p === '..' ? '..' : kebab(p))).join('/');
+    return rewritten + '.md';
+  });
+}
+
 function buildContent(fileName, relDir, content) {
   const title =
     existingTitle(content) ||
@@ -81,6 +90,17 @@ function buildContent(fileName, relDir, content) {
     extractHeading(content, 1) ||
     fileName.replace(/\.md$/i, '');
   const module = relDir.split(path.sep).filter(Boolean).slice(-1)[0] || 'API';
+
+  // Eliminar la sección "## Información General" para que no aparezca
+  // como un catálogo/sidebar independiente en Starlight
+  content = content.replace(/^## Información General\r?\n/gm, '');
+
+  // Eliminar el heading que coincide con el título para evitar duplicación
+  const escapedTitle = title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  content = content.replace(new RegExp(`^#{1,6}\\s+${escapedTitle}\\s*$`, 'gm'), '');
+
+  // Reescribir enlaces relativos (.md) a nombres kebab-case
+  content = rewriteRelativeLinks(content);
 
   let fm = '';
   if (!existingTitle(content)) {
